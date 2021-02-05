@@ -1,7 +1,7 @@
-EPOCH_TIME_DAY_MS = 86400000
-EPOCH_TIME_HOUR_MS = 3600000
-EPOCH_TIME_MINUTE_MS = 60000
-EPOCH_TIME_SECOND_MS = 1000
+DAY_S = 86400
+HOUR_S = 3600
+MINUTE_S = 60
+SECOND_S = 1
 
 # ------------------------------------
 
@@ -25,6 +25,8 @@ BTC_SLASH_USDT = 'BTC/USDT'
 DOGE_KEYWORDS = ['doge',]
 BTC_KEYWORDS = ['bitcoin', 'btc', 'xbt', '₿',]
 OTHER_KEYWORDS = ['coin', 'satoshi', 'crypto']
+
+TOTAL_KEYWORDS = DOGE_KEYWORDS + BTC_KEYWORDS + OTHER_KEYWORDS
 
 # ------------------------------------
 

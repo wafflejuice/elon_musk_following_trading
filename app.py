@@ -85,6 +85,7 @@ def run():
 		},
 	})
 
+	'''
 	database.Database().connect(info['mariaDB']['host'], info['mariaDB']['port'], info['mariaDB']['user'], info['mariaDB']['passwd'])
 	
 	database.Database().execute("CREATE DATABASE IF NOT EXISTS elon_musk_twitter")
@@ -93,6 +94,7 @@ def run():
 	database.Database().execute("ALTER TABLE elon_musk_tweet CONVERT TO CHARSET UTF8")
 	
 	database.Database().commit()
+	'''
 	
 	telegram_get_updates_url = constants.TELEGRAM_GET_UPDATES_BASE_URL.format(info['telegram']['token'])
 	telegram_send_message_url = constants.TELEGRAM_SEND_MESSAGE_BASE_URL.format(info['telegram']['token'])
@@ -161,7 +163,6 @@ def run():
 			return True  # Don't kill the stream
 		
 		def on_timeout(self):
-			print('timeout timeout timeout')
 			print(sys.stderr, 'Timeout...')
 			return True  # Don't kill the stream
 	
