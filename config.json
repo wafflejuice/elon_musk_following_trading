@@ -1,16 +1,22 @@
 {
     "binance": {
-        "biannce_api_key": "YOUR API KEY",
-        "binance_secret_key": "YOUR SECRET KEY"
-    },
-    "telegram": {
-        "telegram_token": "YOUR TELEGRAM TOKEN"
+        "api_key": "YOUR API KEY",
+        "secret_key": "YOUR SECRET KEY"
     },
     "mariaDB": {
         "host": "localhost",
-        "port": "3306",
-        "user": "YOUR USER",
+        "port": 3306,
+        "user": "root",
         "passwd": "YOUR PASSWD",
         "charset": "utf8"
+    },
+    "telegram": {
+        "token": "YOUR TELEGRAM TOKEN"
+    },
+    "twitter": {
+        "api key": "YOUR API KEY",
+        "api secret key": "YOUR SECRET KEY",
+        "access token": "YOUR ACCESS TOKEN",
+        "access token secret": "YOUR ACCESS TOKEN SECRET"
     }
 }
