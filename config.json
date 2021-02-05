@@ -1,0 +1,16 @@
+{
+    "binance": {
+        "biannce_api_key": "YOUR API KEY",
+        "binance_secret_key": "YOUR SECRET KEY"
+    },
+    "telegram": {
+        "telegram_token": "YOUR TELEGRAM TOKEN"
+    },
+    "mariaDB": {
+        "host": "localhost",
+        "port": "3306",
+        "user": "YOUR USER",
+        "passwd": "YOUR PASSWD",
+        "charset": "utf8"
+    }
+}
