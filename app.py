@@ -53,11 +53,18 @@ class CoinThread(threading.Thread):
 	def run(self):
 		Manager().set_has_position(True)
 		
+		round_digit = None
+		
+		if self.__coin_symbol == constants.DOGE_SYMBOL:
+			round_digit = 0
+		elif self.__coin_symbol == constants.BTC_SYMBOL:
+			round_digit = 3
+			
 		exchange.adjust_futures_leverage(self.__futures, self.__coin_symbol, self.__leverage)
-		coin_count = round(0.9 * float(self.__leverage) * exchange.fetch_futures_usdt_balance(self.__futures) / exchange.fetch_futures_coin_price_usdt(self.__futures, self.__coin_symbol), 3)
+		coin_count = round(0.9 * float(self.__leverage) * exchange.fetch_futures_usdt_balance(self.__futures) / exchange.fetch_futures_coin_price_usdt(self.__futures, self.__coin_symbol), round_digit)
 		transaction.futures_market_long(self.__futures, self.__coin_symbol, coin_count, False)
 
-		time.sleep(30)
+		time.sleep(constants.HOUR_S * 0.5)
 
 		transaction.futures_market_short(self.__futures, self.__coin_symbol, coin_count, True)
 		
@@ -103,26 +110,27 @@ def run():
 				print('This is retweet')
 				return
 			
-			if any(x in lowercase_text for x in constants.DOGE_KEYWORDS):
+			if any(x in lowercase_text for x in constants.TOTAL_KEYWORDS):
 				requests.get(telegram_send_message_url, params={'chat_id': chat_id, 'text': text_to_message(name, datetime, original_text), 'parse_mode': 'html'})
+				
+			if any(x in lowercase_text for x in constants.DOGE_KEYWORDS):
+				print('doge case')
 				
 				if not Manager().get_has_position():
 					thread = CoinThread()
 					thread.set_futures(futures)
 					thread.set_coin_symbol(constants.DOGE_SYMBOL)
 					thread.set_leverage(5)
-					thread.run()
+					thread.start()
 			elif any(x in lowercase_text for x in constants.BTC_KEYWORDS):
-				requests.get(telegram_send_message_url, params={'chat_id': chat_id, 'text': text_to_message(name, datetime, original_text), 'parse_mode': 'html'})
+				print('btc case')
 				
 				if not Manager().get_has_position():
 					thread = CoinThread()
 					thread.set_futures(futures)
 					thread.set_coin_symbol(constants.BTC_SYMBOL)
 					thread.set_leverage(5)
-					thread.run()
-			elif any(x in lowercase_text for x in constants.OTHER_KEYWORDS):
-				requests.get(telegram_send_message_url, params={'chat_id': chat_id, 'text': text_to_message(name, datetime, original_text), 'parse_mode': 'html'})
+					thread.start()
 				
 	def text_to_message(writer, datetime, text):
 		return writer + chr(10) + datetime.isoformat() + chr(10) + text
