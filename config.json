@@ -11,12 +11,14 @@
         "charset": "utf8"
     },
     "telegram": {
-        "token": "YOUR TELEGRAM TOKEN"
+        "token": "YOUR TELEGRAM TOKEN",
+        "id": "YOUR TELEGRAM CHAT ID"
     },
     "twitter": {
         "api key": "YOUR API KEY",
         "api secret key": "YOUR SECRET KEY",
         "access token": "YOUR ACCESS TOKEN",
-        "access token secret": "YOUR ACCESS TOKEN SECRET"
+        "access token secret": "YOUR ACCESS TOKEN SECRET",
+        "bearer token": "YOUR BEARER TOKEN"
     }
 }

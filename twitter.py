@@ -1,10 +1,13 @@
 import tweepy
 import constants
 import sys
+import subprocess
+import json
 
 from exchange import Manager
 from exchange import CoinThread
 from telegram import Telegram
+from config import Config
 
 class Twitter:
 	class CustomStreamListener(tweepy.StreamListener):
@@ -19,6 +22,28 @@ class Twitter:
 					if (status.in_reply_to_status_id is None) or (status.in_reply_to_user_id_str == constants.ELON_MUSK_TWITTER_ID):
 						text = status.extended_tweet['full_text'] if status.truncated else status.text
 						Twitter.handle_tweet(status.user.screen_name, status.created_at, text)
+						
+						# handle poll
+						config = Config.load_config()
+						bearer_token = config['twitter']['bearer token']
+						tweet_id = status.id
+						
+						# TODO: os specific
+						response = subprocess.run(['curl',
+												   '--request',
+												   'GET',
+												   constants.TWITTER_POLL_REQUEST_URL.format(tweet_id),
+												   '--header',
+												   'Authorization: Bearer {}'.format(bearer_token)],
+												  capture_output=True)
+						
+						poll_object = json.loads(response.stdout)
+						
+						if 'attachments' in poll_object['data'][0]:
+							if 'poll_ids' in poll_object['data'][0]['attachments']:
+								options = poll_object['includes']['polls'][0]['options']
+								for option in options:
+									Twitter.handle_tweet(status.user.screen_name, status.created_at, option['label'])
 			except:
 				print(sys.stderr, 'Encountered status error')
 				
@@ -45,7 +70,7 @@ class Twitter:
 				if any(x.lower() in lowercase_text for x in constants.DOGE_KEYWORDS):
 					print('doge keywords called.')
 					
-					coin_thread = CoinThread(constants.DOGE_SYMBOL, 8)
+					coin_thread = CoinThread(constants.DOGE_SYMBOL, 10)
 					coin_thread.start()
 					
 				elif any(x.lower() in lowercase_text for x in constants.BTC_KEYWORDS):

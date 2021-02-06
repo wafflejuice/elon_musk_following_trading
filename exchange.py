@@ -181,7 +181,7 @@ class CoinThread(threading.Thread):
 			price_multiple_make_profit_thread = threading.Thread(target=CoinThread.price_multiple_make_profit, args=(self, futures, half_coin_count, coin_start_price, 1.5))
 			price_multiple_make_profit_thread.start()
 			
-			time_passed_make_profit_thread = threading.Thread(target=CoinThread.time_passed_make_profit, args=(self, futures, half_coin_count, coin_count, start_time, 60, 120))
+			time_passed_make_profit_thread = threading.Thread(target=CoinThread.time_passed_make_profit, args=(self, futures, half_coin_count, coin_count, start_time, 600, 1200))
 			time_passed_make_profit_thread.start()
 			time_passed_make_profit_thread.join()
 			

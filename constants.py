@@ -22,7 +22,7 @@ BTC_SLASH_USDT = 'BTC/USDT'
 
 # ------------------------------------
 
-DOGE_KEYWORDS = ['doge', 'Ð', 'such wow', 'much wow']
+DOGE_KEYWORDS = ['doge', 'Ð', 'such wow', 'much wow', 'dogue']
 BTC_KEYWORDS = ['bitcoin', 'btc', 'xbt', '₿']
 OTHER_KEYWORDS = ['coin', 'crypto', 'satoshi', 'satosi']
 
@@ -38,6 +38,7 @@ TELEGRAM_SEND_MESSAGE_BASE_URL = 'https://api.telegram.org/bot{}/sendMessage'
 
 # ------------------------------------
 
+TWITTER_POLL_REQUEST_URL = 'https://api.twitter.com/2/tweets?ids={}&expansions=attachments.poll_ids&poll.fields=duration_minutes,end_datetime,id,options,voting_status'
 ELON_MUSK_TWITTER_ID = '44196397'
 
 # ------------------------------------
