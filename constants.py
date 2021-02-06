@@ -22,11 +22,9 @@ BTC_SLASH_USDT = 'BTC/USDT'
 
 # ------------------------------------
 
-DOGE_KEYWORDS = ['doge',]
-BTC_KEYWORDS = ['bitcoin', 'btc', 'xbt', '₿',]
-OTHER_KEYWORDS = ['coin', 'satoshi', 'crypto']
-
-TOTAL_KEYWORDS = DOGE_KEYWORDS + BTC_KEYWORDS + OTHER_KEYWORDS
+DOGE_KEYWORDS = ['doge', 'Ð', 'such wow', 'much wow']
+BTC_KEYWORDS = ['bitcoin', 'btc', 'xbt', '₿']
+OTHER_KEYWORDS = ['coin', 'crypto', 'satoshi', 'satosi']
 
 # ------------------------------------
 
@@ -41,3 +39,7 @@ TELEGRAM_SEND_MESSAGE_BASE_URL = 'https://api.telegram.org/bot{}/sendMessage'
 # ------------------------------------
 
 ELON_MUSK_TWITTER_ID = '44196397'
+
+# ------------------------------------
+
+CONFIG_FILE = 'config_mine.json'
