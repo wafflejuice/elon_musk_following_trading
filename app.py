@@ -12,7 +12,7 @@ def run():
 	
 	while True:
 		try:
-			print('connect...')
+			print('connect to '+constants.ELON_MUSK_TWITTER_ID+'...')
 			streaming_api = tweepy.streaming.Stream(auth, Twitter.CustomStreamListener(), timeout=60)
 			streaming_api.filter(follow=[constants.ELON_MUSK_TWITTER_ID])
 		except:
