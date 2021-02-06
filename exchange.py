@@ -109,7 +109,7 @@ class Coin:
 			return constants.BTC_USDT
 		
 class CoinThread(threading.Thread):
-	def __init__(self, coin_symbol, leverage):
+	def __init__(self, coin_symbol, balance_ratio, leverage, duration, is_prime):
 		threading.Thread.__init__(self)
 		
 		self.flag_lock = threading.Lock()
@@ -117,7 +117,10 @@ class CoinThread(threading.Thread):
 		self.__safe_profit_flag = False
 		
 		self.__coin_symbol = coin_symbol
+		self.__balance_ratio = balance_ratio
 		self.__leverage = leverage
+		self.__duration = duration
+		self.__is_prime = is_prime
 	
 	def price_multiple_make_profit(self, futures, coin_count, start_price, target_multiple):
 		while True:
@@ -147,6 +150,9 @@ class CoinThread(threading.Thread):
 			time.sleep(5)
 		
 	def run(self):
+		if (not self.__is_prime) and Manager().get_has_position():
+			return
+		
 		Manager().set_has_position(True)
 		
 		config = Config.load_config()
@@ -170,7 +176,7 @@ class CoinThread(threading.Thread):
 		
 		balance_usdt = Futures.fetch_futures_usdt_balance(futures)
 		coin_start_price = Futures.fetch_futures_coin_price_usdt(futures, self.__coin_symbol)
-		coin_count = round(0.9 * self.__leverage * balance_usdt / coin_start_price, round_digit)
+		coin_count = round(self.__balance_ratio * self.__leverage * balance_usdt / coin_start_price, round_digit)
 		start_time = time.time()
 		
 		try:
@@ -181,7 +187,7 @@ class CoinThread(threading.Thread):
 			price_multiple_make_profit_thread = threading.Thread(target=CoinThread.price_multiple_make_profit, args=(self, futures, half_coin_count, coin_start_price, 1.5))
 			price_multiple_make_profit_thread.start()
 			
-			time_passed_make_profit_thread = threading.Thread(target=CoinThread.time_passed_make_profit, args=(self, futures, half_coin_count, coin_count, start_time, 600, 1200))
+			time_passed_make_profit_thread = threading.Thread(target=CoinThread.time_passed_make_profit, args=(self, futures, half_coin_count, coin_count, start_time, int(self.__duration*0.5), self.__duration))
 			time_passed_make_profit_thread.start()
 			time_passed_make_profit_thread.join()
 			

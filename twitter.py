@@ -21,29 +21,28 @@ class Twitter:
 				if status.user.id_str == constants.ELON_MUSK_TWITTER_ID:
 					if (status.in_reply_to_status_id is None) or (status.in_reply_to_user_id_str == constants.ELON_MUSK_TWITTER_ID):
 						text = status.extended_tweet['full_text'] if status.truncated else status.text
-						Twitter.handle_tweet(status.user.screen_name, status.created_at, text)
 						
 						# handle poll
-						config = Config.load_config()
-						bearer_token = config['twitter']['bearer token']
-						tweet_id = status.id
-						
 						# TODO: os specific
 						response = subprocess.run(['curl',
 												   '--request',
 												   'GET',
-												   constants.TWITTER_POLL_REQUEST_URL.format(tweet_id),
+												   constants.TWITTER_POLL_REQUEST_URL.format(status.id),
 												   '--header',
-												   'Authorization: Bearer {}'.format(bearer_token)],
+												   'Authorization: Bearer {}'.format(Config.load_config()['twitter']['bearer token'])],
 												  capture_output=True)
-						
+
+						poll_label_mixture_text = ''
 						poll_object = json.loads(response.stdout)
 						
 						if 'attachments' in poll_object['data'][0]:
 							if 'poll_ids' in poll_object['data'][0]['attachments']:
 								options = poll_object['includes']['polls'][0]['options']
 								for option in options:
-									Twitter.handle_tweet(status.user.screen_name, status.created_at, option['label'])
+									poll_label_mixture_text += option['label']
+						
+						text += poll_label_mixture_text
+						Twitter.handle_tweet(status.user.screen_name, status.created_at, text)
 			except:
 				print(sys.stderr, 'Encountered status error')
 				
@@ -66,20 +65,24 @@ class Twitter:
 				print("retweeted.")
 				return
 			
-			if not Manager().get_has_position():
-				if any(x.lower() in lowercase_text for x in constants.DOGE_KEYWORDS):
-					print('doge keywords called.')
-					
-					coin_thread = CoinThread(constants.DOGE_SYMBOL, 10)
-					coin_thread.start()
-					
-				elif any(x.lower() in lowercase_text for x in constants.BTC_KEYWORDS):
-					print('btc keywords called.')
-					
-					coin_thread = CoinThread(constants.BTC_SYMBOL, 5)
-					coin_thread.start()
+			if any(x.lower() in lowercase_text for x in constants.DOGE_KEYWORDS):
+				print('doge keywords called.')
+				
+				#coin_thread = CoinThread(constants.DOGE_SYMBOL, 0.9, 10, 60, True)
+				coin_thread = CoinThread(constants.DOGE_SYMBOL, 0.9, 10, 1200, True)
+				coin_thread.start()
+				
+			elif any(x.lower() in lowercase_text for x in constants.BTC_KEYWORDS):
+				print('btc keywords called.')
+				
+				#coin_thread = CoinThread(constants.BTC_SYMBOL, 0.9, 5, 60, True)
+				coin_thread = CoinThread(constants.BTC_SYMBOL, 0.9, 5, 1200, True)
+				coin_thread.start()
+			else:
+				print('neutral tweet.')
+				
+				#coin_thread = CoinThread(constants.DOGE_SYMBOL, 0.4, 3, 60, False)
+				coin_thread = CoinThread(constants.DOGE_SYMBOL, 0.4, 3, 300, False)
+				coin_thread.start()
 			
-			total_keywords = constants.DOGE_KEYWORDS + constants.BTC_KEYWORDS + constants.OTHER_KEYWORDS
-			
-			if any(x in lowercase_text for x in total_keywords):
-				Telegram.send_message(Telegram.fetch_chat_id(), Telegram.organize_message(name, datetime, original_text))
+			Telegram.send_message(Telegram.fetch_chat_id(), Telegram.organize_message(name, datetime, original_text))
