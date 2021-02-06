@@ -43,4 +43,4 @@ ELON_MUSK_TWITTER_ID = '44196397'
 
 # ------------------------------------
 
-CONFIG_FILE = 'config_mine.json'
+CONFIG_FILE = 'config.json'
