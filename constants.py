@@ -22,9 +22,9 @@ BTC_SLASH_USDT = 'BTC/USDT'
 
 # ------------------------------------
 
-DOGE_KEYWORDS = ['doge', 'Ð', 'such wow', 'much wow', 'dogue']
+DOGE_KEYWORDS = ['doge', 'Ð', 'such wow', 'much wow', 'so scared', 'dogue', 'coin', 'crypto', 'shiba', 'shibe', 'much funny', 'such meme']
+DOGE_REGEX = ['to(\s)*the(\s)*mo{2,}n']
 BTC_KEYWORDS = ['bitcoin', 'btc', 'xbt', '₿']
-OTHER_KEYWORDS = ['coin', 'crypto', 'satoshi', 'satosi']
 
 # ------------------------------------
 

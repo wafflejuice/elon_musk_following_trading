@@ -3,6 +3,7 @@ import constants
 import sys
 import subprocess
 import json
+import re
 
 from exchange import Manager
 from exchange import CoinThread
@@ -65,24 +66,24 @@ class Twitter:
 				print("retweeted.")
 				return
 			
-			if any(x.lower() in lowercase_text for x in constants.DOGE_KEYWORDS):
+			if any(x.lower() in lowercase_text for x in constants.DOGE_KEYWORDS) or any(re.search(x, lowercase_text, re.IGNORECASE) for x in constants.DOGE_REGEX):
 				print('doge keywords called.')
 				
 				#coin_thread = CoinThread(constants.DOGE_SYMBOL, 0.9, 10, 60, True)
-				coin_thread = CoinThread(constants.DOGE_SYMBOL, 0.9, 10, 1200, True)
+				coin_thread = CoinThread(constants.DOGE_SYMBOL, 0.9, 12, 120, True)
 				coin_thread.start()
 				
 			elif any(x.lower() in lowercase_text for x in constants.BTC_KEYWORDS):
 				print('btc keywords called.')
 				
 				#coin_thread = CoinThread(constants.BTC_SYMBOL, 0.9, 5, 60, True)
-				coin_thread = CoinThread(constants.BTC_SYMBOL, 0.9, 5, 1200, True)
+				coin_thread = CoinThread(constants.BTC_SYMBOL, 0.9, 5, 120, True)
 				coin_thread.start()
 			else:
 				print('neutral tweet.')
 				
-				#coin_thread = CoinThread(constants.DOGE_SYMBOL, 0.4, 3, 60, False)
-				coin_thread = CoinThread(constants.DOGE_SYMBOL, 0.4, 3, 300, False)
+				#coin_thread = CoinThread(constants.DOGE_SYMBOL, 0.5, 5, 60, False)
+				coin_thread = CoinThread(constants.DOGE_SYMBOL, 0.6, 5, 120, False)
 				coin_thread.start()
 			
 			Telegram.send_message(Telegram.fetch_chat_id(), Telegram.organize_message(name, datetime, original_text))
