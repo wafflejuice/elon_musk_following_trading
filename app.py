@@ -1,4 +1,5 @@
 import tweepy
+import sys
 
 from config import Config
 from twitter import Twitter
@@ -15,6 +16,6 @@ def run():
 			print('connect to '+constants.ELON_MUSK_TWITTER_ID+'...')
 			streaming_api = tweepy.streaming.Stream(auth, Twitter.CustomStreamListener(), timeout=60)
 			streaming_api.filter(follow=[constants.ELON_MUSK_TWITTER_ID])
-		except:
-			print('Twitter error occurred')
+		except tweepy.TweepError as e:
+			print(sys.stderr, e)
 			continue
