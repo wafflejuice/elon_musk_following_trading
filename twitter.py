@@ -1,6 +1,5 @@
 import tweepy
 import constants
-import sys
 import subprocess
 import json
 import re
