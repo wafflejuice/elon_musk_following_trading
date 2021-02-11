@@ -1,7 +1,7 @@
 import json
 
 class Config:
-	CONFIG_FILE = 'config_mine.json'
+	CONFIG_FILE = 'config.json'
 	
 	@classmethod
 	def load_config(cls):
