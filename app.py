@@ -1,9 +1,11 @@
 import tweepy
-import sys
+import time
 
 from config import Config
 from twitter import Twitter
 import constants
+import logger
+
 
 def run():
 	config = Config.load_config()
@@ -13,9 +15,16 @@ def run():
 	
 	while True:
 		try:
-			print('connect to '+constants.ELON_MUSK_TWITTER_ID+'...')
+			logger.logger.info('connect to '+constants.ELON_MUSK_TWITTER_ID+'...')
+			
 			streaming_api = tweepy.streaming.Stream(auth, Twitter.CustomStreamListener(), timeout=60)
 			streaming_api.filter(follow=[constants.ELON_MUSK_TWITTER_ID])
 		except tweepy.TweepError as e:
-			print(sys.stderr, e)
+			logger.logger.error(e)
+			
+			continue
+		except:
+			logger.logger.error("Unknown error")
+			time.sleep(60)
+			
 			continue
