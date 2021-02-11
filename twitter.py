@@ -4,11 +4,11 @@ import sys
 import subprocess
 import json
 import re
-from datetime import time
 
 from exchange import CoinThread
 from telegram import Telegram
 from config import Config
+import logger
 
 class Twitter:
 	TWITTER_POLL_REQUEST_URL = 'https://api.twitter.com/2/tweets?ids={}&expansions=attachments.poll_ids&poll.fields=duration_minutes,end_datetime,id,options,voting_status'
@@ -41,15 +41,18 @@ class Twitter:
 						
 						text += poll_label_mixture_text
 						Twitter.handle_tweet(status.user.screen_name, status.created_at, text)
-			except:
-				print(sys.stderr, 'Encountered status error')
+			except Exception as e:
+				logger.logger.error(e)
 				
 		def on_error(self, status_code):
-			print(sys.stderr, 'Encountered error with status code:', status_code)
+			logger.logger.error('Encountered error with status code:')
+			logger.logger.error(status_code)
+			
 			return True # Don't kill the stream
 		
 		def on_timeout(self):
-			print(sys.stderr, 'Timeout...')
+			logger.logger.error('Timeout...')
+			
 			return True # Don't kill the stream
 		
 	@staticmethod
@@ -60,26 +63,24 @@ class Twitter:
 			
 			# Don't care about retweets.
 			if lowercase_text.startswith("rt @"):
-				print("retweeted.")
+				logger.logger.info('retweet.')
+				
 				return
 			
 			if any(x.lower() in lowercase_text for x in constants.DOGE_KEYWORDS) or any(re.search(x, lowercase_text, re.IGNORECASE) for x in constants.DOGE_REGEX):
-				print('doge keywords called.')
+				logger.logger.info('doge keywords called.')
 				
-				#coin_thread = CoinThread(constants.DOGE_SYMBOL, 0.9, 10, 60, True)
 				coin_thread = CoinThread(constants.DOGE_SYMBOL, 0.9, 12, 120, True)
 				coin_thread.start()
 				
 			elif any(x.lower() in lowercase_text for x in constants.BTC_KEYWORDS):
-				print('btc keywords called.')
+				logger.logger.info('btc keywords called.')
 				
-				#coin_thread = CoinThread(constants.BTC_SYMBOL, 0.9, 5, 60, True)
 				coin_thread = CoinThread(constants.BTC_SYMBOL, 0.9, 5, 120, True)
 				coin_thread.start()
 			else:
-				print('neutral tweet.')
+				logger.logger.info('neutral tweet.')
 				
-				#coin_thread = CoinThread(constants.DOGE_SYMBOL, 0.5, 5, 60, False)
 				coin_thread = CoinThread(constants.DOGE_SYMBOL, 0.6, 5, 120, False)
 				coin_thread.start()
 			
