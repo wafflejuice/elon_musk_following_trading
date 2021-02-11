@@ -23,8 +23,8 @@ def run():
 			logger.logger.error(e)
 			
 			continue
-		except:
-			logger.logger.error("Unknown error")
-			time.sleep(60)
+		except Exception as e:
+			logger.logger.error(e)
+			time.sleep(30)
 			
 			continue
