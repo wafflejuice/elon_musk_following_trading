@@ -5,11 +5,6 @@ SECOND_S = 1
 
 # ------------------------------------
 
-BINANCE_NAME = 'BINANCE'
-FUTURES_NAME = 'FUTURES'
-
-# ------------------------------------
-
 USDT_SYMBOL = 'USDT'
 
 DOGE_SYMBOL = 'DOGE'
@@ -33,14 +28,4 @@ BINANCE_TAKER_FEE_RATIO = 0.001
 
 # ------------------------------------
 
-TELEGRAM_GET_UPDATES_BASE_URL = 'https://api.telegram.org/bot{}/getUpdates'
-TELEGRAM_SEND_MESSAGE_BASE_URL = 'https://api.telegram.org/bot{}/sendMessage'
-
-# ------------------------------------
-
-TWITTER_POLL_REQUEST_URL = 'https://api.twitter.com/2/tweets?ids={}&expansions=attachments.poll_ids&poll.fields=duration_minutes,end_datetime,id,options,voting_status'
 ELON_MUSK_TWITTER_ID = '44196397'
-
-# ------------------------------------
-
-CONFIG_FILE = 'config.json'
