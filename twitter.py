@@ -30,8 +30,6 @@ class Twitter:
 						text_bundle += Twitter.extract_poll_choices(status)
 						
 						Twitter.bet_on_tweet(status.user.screen_name, status.created_at, text_bundle, 0.9, 12)
-					else:
-						Twitter.bet_on_reply(status.user.screen_name, status.created_at, text_bundle, 0.6, 6)
 						
 			except Exception as e:
 				logger.logger.error('Encountered on_status error')
@@ -95,7 +93,7 @@ class Twitter:
 					
 		if doge_flag:
 			balance_ratio = balance_ratio_limit * HIGH_BALANCE_FACTOR
-			leverage = leverage_limit * HIGH_LEVERAGE_FACTOR
+			leverage = int(leverage_limit * HIGH_LEVERAGE_FACTOR)
 			
 			coin_thread = CoinThread(constants.DOGE_SYMBOL, balance_ratio, leverage, 120, True)
 			coin_thread.start()
@@ -104,7 +102,7 @@ class Twitter:
 			
 		elif btc_flag:
 			balance_ratio = balance_ratio_limit * HIGH_BALANCE_FACTOR
-			leverage = leverage_limit * LOW_LEVERAGE_FACTOR
+			leverage = int(leverage_limit * LOW_LEVERAGE_FACTOR)
 			
 			coin_thread = CoinThread(constants.BTC_SYMBOL, balance_ratio, leverage, 120, True)
 			coin_thread.start()
@@ -113,56 +111,13 @@ class Twitter:
 			
 		else:
 			balance_ratio = balance_ratio_limit * LOW_BALANCE_FACTOR
-			leverage = leverage_limit * LOW_LEVERAGE_FACTOR
+			leverage = int(leverage_limit * LOW_LEVERAGE_FACTOR)
 			
 			coin_thread = CoinThread(constants.DOGE_SYMBOL, balance_ratio, leverage, 120, False)
 			coin_thread.start()
 			
 			logger.logger.info('neutral tweet.')
 			
-		text_bundle_message = Telegram.args_to_message(text_bundle)
-		message = Telegram.organize_message(name, datetime, text_bundle_message)
-		
-		Telegram.send_message(Telegram.fetch_chat_id(), message)
-		
-	@staticmethod
-	def bet_on_reply(name, datetime, text_bundle, balance_ratio_limit, leverage_limit):
-		HIGH_BALANCE_FACTOR = 1.0
-		LOW_BALANCE_FACTOR = 0.6
-		
-		HIGH_LEVERAGE_FACTOR = 1.0
-		LOW_LEVERAGE_FACTOR = 0.5
-		
-		doge_flag = False
-		btc_flag = False
-		
-		for text in text_bundle:
-			if text is not None:
-				text = text.lower()
-				
-				if any(x.lower() in text for x in constants.DOGE_KEYWORDS) or any(re.search(x, text, re.IGNORECASE) for x in constants.DOGE_REGEX):
-					doge_flag = True
-				elif any(x.lower() in text for x in constants.BTC_KEYWORDS):
-					btc_flag = True
-		
-		if doge_flag:
-			balance_ratio = balance_ratio_limit * HIGH_BALANCE_FACTOR
-			leverage = leverage_limit * HIGH_LEVERAGE_FACTOR
-			
-			coin_thread = CoinThread(constants.DOGE_SYMBOL, balance_ratio, leverage, 120, True)
-			coin_thread.start()
-			
-			logger.logger.info('doge keywords called.')
-		
-		elif btc_flag:
-			balance_ratio = balance_ratio_limit * HIGH_BALANCE_FACTOR
-			leverage = leverage_limit * LOW_LEVERAGE_FACTOR
-			
-			coin_thread = CoinThread(constants.BTC_SYMBOL, balance_ratio, leverage, 120, True)
-			coin_thread.start()
-			
-			logger.logger.info('btc keywords called.')
-		
 		text_bundle_message = Telegram.args_to_message(text_bundle)
 		message = Telegram.organize_message(name, datetime, text_bundle_message)
 		
