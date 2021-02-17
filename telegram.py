@@ -6,6 +6,8 @@ class Telegram:
 	TELEGRAM_GET_UPDATES_BASE_URL = 'https://api.telegram.org/bot{}/getUpdates'
 	TELEGRAM_SEND_MESSAGE_BASE_URL = 'https://api.telegram.org/bot{}/sendMessage'
 	
+	LINE_BREAK = chr(10)
+	
 	# TODO: make the bot handles multiple users
 	# TODO: sometimes can't fetch id... So temporarily hard coded chat id.
 	@staticmethod
@@ -24,6 +26,15 @@ class Telegram:
 		
 		requests.get(send_message_url, params={'chat_id': chat_id, 'text': message, 'parse_mode': 'html'})
 
-	@staticmethod
-	def organize_message(writer, datetime, text):
-		return writer + chr(10) + datetime.isoformat() + chr(10) + text
+	@classmethod
+	def organize_message(cls, writer, datetime, text):
+		return writer + cls.LINE_BREAK + datetime.isoformat() + cls.LINE_BREAK + text
+	
+	@classmethod
+	def args_to_message(cls, args):
+		message = ''
+		
+		for arg in args:
+			message = message + cls.LINE_BREAK + str(arg)
+		
+		return message

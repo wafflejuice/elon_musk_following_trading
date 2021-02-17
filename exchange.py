@@ -4,6 +4,7 @@ import time
 
 from config import Config
 import constants
+import logger
 
 class Manager(object):
 	__has_position = None
@@ -191,8 +192,8 @@ class CoinThread(threading.Thread):
 			time_passed_make_profit_thread.start()
 			time_passed_make_profit_thread.join()
 			
-		except:
-			print('futures error occurred.')
+		except Exception as e:
+			logger.logger.error(e)
 		
 		finally:
 			Manager().set_has_position(False)
