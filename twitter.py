@@ -12,12 +12,26 @@ import logger
 class Twitter:
 	TWITTER_POLL_REQUEST_URL = 'https://api.twitter.com/2/tweets?ids={}&expansions=attachments.poll_ids&poll.fields=duration_minutes,end_datetime,id,options,voting_status'
 	
+	def __new__(cls, *args, **kwargs):
+		if not hasattr(cls, "_instance"):
+			cls._instance = super().__new__(cls)
+		return cls._instance
+	
+	def __init__(self):
+		cls = type(self)
+		if not hasattr(cls, "_init"):
+			cls._init = True
+			
+			config = Config.load_config()
+			self.oauth1a = tweepy.OAuthHandler(config['twitter']['api key'], config['twitter']['api secret key'])
+			self.oauth1a.set_access_token(config['twitter']['access token'], config['twitter']['access token secret'])
+	
 	class CustomStreamListener(tweepy.StreamListener):
 		def on_status(self, status):
 			try:
-				if status.user.id_str == constants.ELON_MUSK_TWITTER_ID:
+				if status.user.id_str == constants.ELON_MUSK_TWITTER_ID and Twitter.is_thread_monopoly(status):
 					text = status.extended_tweet['full_text'] if status.truncated else status.text
-					
+	
 					# Don't care about retweets.
 					if Twitter.is_rt(text):
 						logger.logger.info('retweet.')
@@ -25,12 +39,10 @@ class Twitter:
 						return
 					
 					text_bundle = [text]
+					text_bundle += Twitter.extract_poll_choices(status)
 					
-					if (status.in_reply_to_status_id is None) or (status.in_reply_to_user_id_str == constants.ELON_MUSK_TWITTER_ID):
-						text_bundle += Twitter.extract_poll_choices(status)
-						
-						Twitter.bet_on_tweet(status.user.screen_name, status.created_at, text_bundle, 0.9, 10)
-						
+					Twitter.bet_on_tweet(status.user.screen_name, status.created_at, text_bundle, 0.9, 10)
+		
 			except Exception as e:
 				logger.logger.error('Encountered on_status error')
 				logger.logger.error(e)
@@ -45,6 +57,10 @@ class Twitter:
 			logger.logger.error('Timeout...')
 			
 			return True # Don't kill the stream
+
+	@staticmethod
+	def is_rt(text):
+		return text.lower().startswith("rt @")
 	
 	@classmethod
 	def extract_poll_choices(cls, status):
@@ -67,9 +83,28 @@ class Twitter:
 		
 		return poll_choices
 	
-	@staticmethod
-	def is_rt(text):
-		return text.lower().startswith("rt @")
+	@classmethod
+	def find_thread_start_user_id_str(cls, status):
+		if status.in_reply_to_status_id is None:
+			return status.user.id_str
+		
+		api = tweepy.API(Twitter().oauth1a)
+		target_status = api.get_status(status.in_reply_to_status_id)
+		
+		return cls.find_thread_start_user_id_str(target_status)
+
+	@classmethod
+	def is_thread_monopoly(cls, status):
+		if status.in_reply_to_status_id is None:
+			return True
+		
+		if status.in_reply_to_user_id_str != status.user.id_str:
+			return False
+		
+		api = tweepy.API(Twitter().oauth1a)
+		target_status = api.get_status(status.in_reply_to_status_id)
+		
+		return cls.is_thread_monopoly(target_status)
 		
 	@staticmethod
 	def bet_on_tweet(name, datetime, text_bundle, balance_ratio_limit, leverage_limit):
