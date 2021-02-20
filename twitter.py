@@ -29,7 +29,7 @@ class Twitter:
 					if (status.in_reply_to_status_id is None) or (status.in_reply_to_user_id_str == constants.ELON_MUSK_TWITTER_ID):
 						text_bundle += Twitter.extract_poll_choices(status)
 						
-						Twitter.bet_on_tweet(status.user.screen_name, status.created_at, text_bundle, 0.9, 12)
+						Twitter.bet_on_tweet(status.user.screen_name, status.created_at, text_bundle, 0.9, 10)
 						
 			except Exception as e:
 				logger.logger.error('Encountered on_status error')
@@ -80,7 +80,6 @@ class Twitter:
 		LOW_LEVERAGE_FACTOR = 0.5
 		
 		doge_flag = False
-		btc_flag = False
 		
 		for text in text_bundle:
 			if text is not None:
@@ -88,8 +87,6 @@ class Twitter:
 				
 				if any(x.lower() in text for x in constants.DOGE_KEYWORDS) or any(re.search(x, text, re.IGNORECASE) for x in constants.DOGE_REGEX):
 					doge_flag = True
-				elif any(x.lower() in text for x in constants.BTC_KEYWORDS):
-					btc_flag = True
 					
 		if doge_flag:
 			balance_ratio = balance_ratio_limit * HIGH_BALANCE_FACTOR
@@ -99,16 +96,6 @@ class Twitter:
 			coin_thread.start()
 			
 			logger.logger.info('doge keywords called.')
-			
-		elif btc_flag:
-			balance_ratio = balance_ratio_limit * HIGH_BALANCE_FACTOR
-			leverage = int(leverage_limit * LOW_LEVERAGE_FACTOR)
-			
-			coin_thread = CoinThread(constants.BTC_SYMBOL, balance_ratio, leverage, 120, True)
-			coin_thread.start()
-			
-			logger.logger.info('btc keywords called.')
-			
 		else:
 			balance_ratio = balance_ratio_limit * LOW_BALANCE_FACTOR
 			leverage = int(leverage_limit * LOW_LEVERAGE_FACTOR)

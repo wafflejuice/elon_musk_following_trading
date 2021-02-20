@@ -23,9 +23,4 @@ BTC_KEYWORDS = ['bitcoin', 'btc', 'xbt', '₿']
 
 # ------------------------------------
 
-BINANCE_MAKER_FEE_RATIO = 0.001
-BINANCE_TAKER_FEE_RATIO = 0.001
-
-# ------------------------------------
-
 ELON_MUSK_TWITTER_ID = '44196397'
