@@ -34,14 +34,12 @@ class Twitter:
 	
 					# Don't care about retweets.
 					if Twitter.is_rt(text):
-						logger.logger.info('retweet.')
-						
 						return
 					
 					text_bundle = [text]
-					text_bundle += Twitter.extract_poll_choices(status)
+					#text_bundle += Twitter.extract_poll_choices(status)
 					
-					Twitter.bet_on_tweet(status.user.screen_name, status.created_at, text_bundle, 0.9, 10)
+					Twitter.bet_on_tweet(status.user.screen_name, status.created_at, text_bundle, 0.92, 10)
 		
 			except Exception as e:
 				logger.logger.error('Encountered on_status error')
@@ -122,6 +120,8 @@ class Twitter:
 				
 				if any(x.lower() in text for x in constants.DOGE_KEYWORDS) or any(re.search(x, text, re.IGNORECASE) for x in constants.DOGE_REGEX):
 					doge_flag = True
+					
+					break
 					
 		if doge_flag:
 			balance_ratio = balance_ratio_limit * HIGH_BALANCE_FACTOR
