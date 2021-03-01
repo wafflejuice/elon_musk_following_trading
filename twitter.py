@@ -109,10 +109,10 @@ class Twitter:
 	@staticmethod
 	def bet_on_tweet(name, datetime, text_bundle, balance_ratio_limit, leverage_limit):
 		HIGH_BALANCE_FACTOR = 1.0
-		LOW_BALANCE_FACTOR = 0.6
+		LOW_BALANCE_FACTOR = 0.5
 		
 		HIGH_LEVERAGE_FACTOR = 1.0
-		LOW_LEVERAGE_FACTOR = 0.5
+		LOW_LEVERAGE_FACTOR = 0.4
 		
 		doge_flag = False
 		
