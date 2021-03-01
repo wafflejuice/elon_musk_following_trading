@@ -166,14 +166,9 @@ class CoinThread(threading.Thread):
 			},
 		})
 
-		round_digit = None
+		round_digit = 0
 		
-		if self.__coin_symbol == constants.DOGE_SYMBOL:
-			round_digit = 0
-		elif self.__coin_symbol == constants.BTC_SYMBOL:
-			round_digit = 3
-		
-		Futures.adjust_futures_leverage(futures, self.__coin_symbol, self.__leverage)
+		#Futures.adjust_futures_leverage(futures, self.__coin_symbol, self.__leverage)
 		
 		balance_usdt = Futures.fetch_futures_usdt_balance(futures)
 		coin_start_price = Futures.fetch_futures_coin_price_usdt(futures, self.__coin_symbol)
@@ -184,9 +179,6 @@ class CoinThread(threading.Thread):
 			Futures.futures_market_long(futures, self.__coin_symbol, coin_count, False)
 			
 			half_coin_count = round(coin_count * 0.5, round_digit)
-			
-			price_multiple_make_profit_thread = threading.Thread(target=CoinThread.price_multiple_make_profit, args=(self, futures, half_coin_count, coin_start_price, 1.5))
-			price_multiple_make_profit_thread.start()
 			
 			time_passed_make_profit_thread = threading.Thread(target=CoinThread.time_passed_make_profit, args=(self, futures, half_coin_count, coin_count, start_time, int(self.__duration*0.5), self.__duration))
 			time_passed_make_profit_thread.start()
