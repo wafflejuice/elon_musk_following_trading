@@ -131,16 +131,8 @@ class Twitter:
 			coin_thread.start()
 			
 			logger.logger.info('doge keywords called.')
-		else:
-			balance_ratio = balance_ratio_limit * LOW_BALANCE_FACTOR
-			leverage = int(leverage_limit * LOW_LEVERAGE_FACTOR)
 			
-			coin_thread = CoinThread(constants.DOGE_SYMBOL, balance_ratio, leverage, 120, False)
-			coin_thread.start()
+			text_bundle_message = Telegram.args_to_message(text_bundle)
+			message = Telegram.organize_message(name, datetime, text_bundle_message)
 			
-			logger.logger.info('neutral tweet.')
-			
-		text_bundle_message = Telegram.args_to_message(text_bundle)
-		message = Telegram.organize_message(name, datetime, text_bundle_message)
-		
-		Telegram.send_message(Telegram.fetch_chat_id(), message)
+			Telegram.send_message(Telegram.fetch_chat_id(), message)
