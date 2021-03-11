@@ -128,7 +128,6 @@ class Twitter:
 			logger.logger.info(log_time)
 			logger.logger.info("doge keywords called.")
 			
-			text_bundle += [log_time]
 			remaining_balance = Futures().fetch_futures_usdt_balance()
 			text_bundle += ["remaining balance is", str(remaining_balance)]
 			text_bundle_message = Telegram.args_to_message(text_bundle)

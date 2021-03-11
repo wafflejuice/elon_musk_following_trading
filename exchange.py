@@ -66,8 +66,9 @@ class Futures:
 		})
 	
 	def futures_market_order(self, coin_symbol, coin_count, side, reduce_only):
+		res = None
 		if reduce_only:
-			self.futures.fapiPrivatePostOrder({
+			res = self.futures.fapiPrivatePostOrder({
 				'symbol': Coin.get_futures_coin_usdt_id(coin_symbol),
 				'side': side,
 				'type': 'MARKET',
@@ -75,12 +76,14 @@ class Futures:
 				'reduceOnly': 'true',
 			})
 		else:
-			self.futures.fapiPrivatePostOrder({
+			res = self.futures.fapiPrivatePostOrder({
 				'symbol': Coin.get_futures_coin_usdt_id(coin_symbol),
 				'side': side,
 				'type': 'MARKET',
 				'quantity': coin_count,
 			})
+		
+		logger.logger.info(res)
 
 	@staticmethod
 	def futures_market_long(coin_symbol, coin_count, reduce_only):
