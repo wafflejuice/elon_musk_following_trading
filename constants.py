@@ -20,7 +20,3 @@ BTC_SLASH_USDT = 'BTC/USDT'
 DOGE_KEYWORDS = ['doge', 'Ð', 'such wow', 'much wow', 'so scared', 'dogue', 'coin', 'crypto', 'shiba', 'shibe', 'much funny', 'such meme']
 DOGE_REGEX = ['to(\s)*the(\s)*mo{2,}n', '2(\s)*the(\s)*mo{2,}n']
 BTC_KEYWORDS = ['bitcoin', 'btc', 'xbt', '₿']
-
-# ------------------------------------
-
-ELON_MUSK_TWITTER_ID = '44196397'

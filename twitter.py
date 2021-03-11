@@ -3,11 +3,14 @@ import constants
 import subprocess
 import json
 import re
+import time
 
-from exchange import CoinThread
+from exchange import Futures
+from exchange import Coin
 from telegram import Telegram
 from config import Config
 import logger
+
 
 class Twitter:
 	TWITTER_POLL_REQUEST_URL = 'https://api.twitter.com/2/tweets?ids={}&expansions=attachments.poll_ids&poll.fields=duration_minutes,end_datetime,id,options,voting_status'
@@ -25,6 +28,7 @@ class Twitter:
 			config = Config.load_config()
 			self.oauth1a = tweepy.OAuthHandler(config['twitter']['api key'], config['twitter']['api secret key'])
 			self.oauth1a.set_access_token(config['twitter']['access token'], config['twitter']['access token secret'])
+			self.api = tweepy.API(Twitter().oauth1a)
 	
 	class CustomStreamListener(tweepy.StreamListener):
 		def on_status(self, status):
@@ -39,7 +43,7 @@ class Twitter:
 					text_bundle = [text]
 					#text_bundle += Twitter.extract_poll_choices(status)
 					
-					Twitter.bet_on_tweet(status.user.screen_name, status.created_at, text_bundle, 0.92, 10)
+					Twitter.bet_on_tweet_steady(status.user.screen_name, status.created_at, text_bundle, 7200)
 		
 			except Exception as e:
 				logger.logger.error('Encountered on_status error')
@@ -99,39 +103,34 @@ class Twitter:
 		if status.in_reply_to_user_id_str != status.user.id_str:
 			return False
 		
-		api = tweepy.API(Twitter().oauth1a)
-		target_status = api.get_status(status.in_reply_to_status_id)
+		target_status = Twitter().api.get_status(status.in_reply_to_status_id)
 		
 		return cls.is_thread_monopoly(target_status)
-		
+	
 	@staticmethod
-	def bet_on_tweet(name, datetime, text_bundle, balance_ratio_limit, leverage_limit):
-		HIGH_BALANCE_FACTOR = 1.0
-		LOW_BALANCE_FACTOR = 1.0
-		
-		HIGH_LEVERAGE_FACTOR = 1.0
-		LOW_LEVERAGE_FACTOR = 0.3
-		
+	def bet_on_tweet_steady(name, datetime, text_bundle, balance):
 		doge_flag = False
 		
 		for text in text_bundle:
 			if text is not None:
 				text = text.lower()
 				
-				if any(x.lower() in text for x in constants.DOGE_KEYWORDS) or any(re.search(x, text, re.IGNORECASE) for x in constants.DOGE_REGEX):
+				if any(x.lower() in text for x in constants.DOGE_KEYWORDS) or any(
+						re.search(x, text, re.IGNORECASE) for x in constants.DOGE_REGEX):
 					doge_flag = True
 					
 					break
-					
+		
 		if doge_flag:
-			balance_ratio = balance_ratio_limit * HIGH_BALANCE_FACTOR
-			leverage = int(leverage_limit * HIGH_LEVERAGE_FACTOR)
+			Coin().run(constants.DOGE_SYMBOL, balance, 120)
 			
-			coin_thread = CoinThread(constants.DOGE_SYMBOL, balance_ratio, leverage, 120, True)
-			coin_thread.start()
+			log_time = time.strftime('%c', time.localtime(time.time()))
+			logger.logger.info(log_time)
+			logger.logger.info("doge keywords called.")
 			
-			logger.logger.info('doge keywords called.')
-			
+			text_bundle += [log_time]
+			remaining_balance = Futures().fetch_futures_usdt_balance()
+			text_bundle += ["remaining balance is", str(remaining_balance)]
 			text_bundle_message = Telegram.args_to_message(text_bundle)
 			message = Telegram.organize_message(name, datetime, text_bundle_message)
 			
