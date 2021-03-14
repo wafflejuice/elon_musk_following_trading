@@ -66,7 +66,6 @@ class Futures:
 		})
 	
 	def futures_market_order(self, coin_symbol, coin_count, side, reduce_only):
-		res = None
 		if reduce_only:
 			res = self.futures.fapiPrivatePostOrder({
 				'symbol': Coin.get_futures_coin_usdt_id(coin_symbol),
@@ -139,6 +138,8 @@ class Coin:
 	def run(self, symbol, balance, duration):
 		if symbol == constants.DOGE_SYMBOL:
 			coin_count = int(balance / self.doge_price_store)
+			
+			logger.logger.info('coin count = {}'.format(coin_count))
 			
 			try:
 				Futures().futures_market_long(symbol, coin_count, False)

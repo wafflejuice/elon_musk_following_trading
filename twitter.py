@@ -43,7 +43,7 @@ class Twitter:
 					text_bundle = [text]
 					#text_bundle += Twitter.extract_poll_choices(status)
 					
-					Twitter.bet_on_tweet_steady(status.user.screen_name, status.created_at, text_bundle, 7200)
+					Twitter.bet_on_tweet_steady(status.user.screen_name, status.created_at, text_bundle, 6000)
 		
 			except Exception as e:
 				logger.logger.error('Encountered on_status error')
