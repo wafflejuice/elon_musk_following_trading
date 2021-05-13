@@ -43,7 +43,7 @@ class Twitter:
 					text_bundle = [text]
 					#text_bundle += Twitter.extract_poll_choices(status)
 					
-					Twitter.bet_on_tweet_steady(status.user.screen_name, status.created_at, text_bundle, 80000)
+					Twitter.bet_on_tweet_steady(status.user.screen_name, status.created_at, text_bundle, 20000)
 		
 			except Exception as e:
 				logger.logger.error('Encountered on_status error')
@@ -115,8 +115,9 @@ class Twitter:
 			if text is not None:
 				text = text.lower()
 				
-				if any(x.lower() in text for x in constants.DOGE_KEYWORDS) or any(
-						re.search(x, text, re.IGNORECASE) for x in constants.DOGE_REGEX):
+				#if any(x.lower() in text for x in constants.DOGE_KEYWORDS) or any(
+				#		re.search(x, text, re.IGNORECASE) for x in constants.DOGE_REGEX):
+				if any(x.lower() in text for x in constants.DOGE_KEYWORDS):
 					doge_flag = True
 					
 					break

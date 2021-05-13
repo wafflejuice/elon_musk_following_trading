@@ -18,8 +18,8 @@ BTC_SLASH_USDT = 'BTC/USDT'
 # ------------------------------------
 
 DOGE_KEYWORDS = ['doge', 'Ð', 'dogue', 'shiba', 'shibe']
-DOGE_REGEX = ['to(\s)*the(\s)*mo{2,}n', '2(\s)*the(\s)*mo{2,}n']
-BTC_KEYWORDS = ['bitcoin', 'btc', 'xbt', '₿']
+# DOGE_REGEX = ['to(\s)*the(\s)*mo{2,}n', '2(\s)*the(\s)*mo{2,}n']
+# BTC_KEYWORDS = ['bitcoin', 'btc', 'xbt', '₿']
 
 # ------------------------------------
 

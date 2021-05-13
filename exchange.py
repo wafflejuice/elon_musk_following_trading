@@ -6,6 +6,7 @@ import threading
 from config import Config
 import constants
 import logger
+from telegram import Telegram
 
 
 class Futures:
@@ -82,17 +83,39 @@ class Futures:
 				'type': 'MARKET',
 				'quantity': coin_count,
 			})
-		
 		logger.logger.info(res)
+		
+		return res
 
 	@staticmethod
 	def futures_market_long(coin_symbol, coin_count, reduce_only):
-		Futures().futures_market_order(coin_symbol, coin_count, 'BUY', reduce_only)
+		return Futures().futures_market_order(coin_symbol, coin_count, 'BUY', reduce_only)
 
 	@staticmethod
 	def futures_market_short(coin_symbol, coin_count, reduce_only):
-		Futures().futures_market_order(coin_symbol, coin_count, 'SELL', reduce_only)
-			
+		return Futures().futures_market_order(coin_symbol, coin_count, 'SELL', reduce_only)
+	
+	def futures_stop_market_order(self, coin_symbol, coin_count, side, stop_price):
+		res = self.futures.fapiPrivatePostOrder({
+			'symbol': Coin.get_futures_coin_usdt_id(coin_symbol),
+			'side': side,
+			'type': 'STOP_MARKET',
+			'quantity': coin_count,
+			'stopPrice': stop_price,
+		})
+		logger.logger.info(res)
+		
+		return res
+	
+	def futures_cancel_order(self, coin_symbol, order_id):
+		res = self.futures.fapiPrivateDeleteOrder({
+			'symbol': Coin.get_futures_coin_usdt_id(coin_symbol),
+			'orderId': order_id,
+		})
+		logger.logger.info(res)
+		
+		return res
+		
 class Coin:
 	def __new__(cls, *args, **kwargs):
 		if not hasattr(cls, "_instance"):
@@ -145,21 +168,36 @@ class Coin:
 			coin_count = int(balance / price)
 			
 			try:
-				Futures().futures_market_long(symbol, coin_count, False)
+				market_long_res = Futures().futures_market_long(symbol, coin_count, False)
+				logger.logger.info(market_long_res)
 				
-				logger.logger.info('betting balance = {}, stored price = {}, coin count = {}'.format(balance, price, coin_count))
+				text_bundle = []
 				
-				#half_coin_count = int(coin_count * 0.5)
-				#half_duration = duration * 0.5
+				market_long_text = 'betting balance={}, stored price={}, coin count={}'.format(balance, price, coin_count)
+				text_bundle.append(market_long_text)
+				logger.logger.info(market_long_text)
 				
-				#time.sleep(half_duration)
-				#Futures().futures_market_short(symbol, half_coin_count, True)
+				latest_price = Futures().fetch_futures_coin_price_usdt(symbol)
+				stop_price = int((latest_price * 0.99) * 100000) / 100000.0
+				stop_order_res = Futures().futures_stop_market_order(symbol, coin_count, 'SELL', stop_price)
+				logger.logger.info(stop_order_res)
+				
+				stop_text = 'latest price={}, stop price={}'.format(latest_price, stop_price)
+				text_bundle.append(stop_text)
+				logger.logger.info(stop_text)
+				
+				Telegram.send_message(Telegram.fetch_chat_id(), Telegram.args_to_message(text_bundle))
 				
 				time.sleep(duration)
-				#Futures().futures_market_short(symbol, coin_count - half_coin_count, True)
-				Futures().futures_market_short(symbol, coin_count, True)
+				
+				market_short_res = Futures().futures_market_short(symbol, coin_count, True)
+				logger.logger.info(market_short_res)
+				
+				cancel_stop_order_res = Futures().futures_cancel_order(symbol, stop_order_res['orderId'])
+				logger.logger.info(cancel_stop_order_res)
 				
 				self.update_price()
 			
 			except Exception as e:
 				logger.logger.error(e)
+				Telegram.send_message(Telegram.fetch_chat_id(), e)
