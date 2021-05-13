@@ -43,7 +43,7 @@ class Twitter:
 					text_bundle = [text]
 					#text_bundle += Twitter.extract_poll_choices(status)
 					
-					Twitter.bet_on_tweet_steady(status.user.screen_name, status.created_at, text_bundle, 6000)
+					Twitter.bet_on_tweet_steady(status.user.screen_name, status.created_at, text_bundle, 80000)
 		
 			except Exception as e:
 				logger.logger.error('Encountered on_status error')
@@ -122,7 +122,7 @@ class Twitter:
 					break
 		
 		if doge_flag:
-			Coin().run(constants.DOGE_SYMBOL, balance, 120)
+			Coin().run(constants.DOGE_SYMBOL, balance, 600)
 			
 			log_time = time.strftime('%c', time.localtime(time.time()))
 			logger.logger.info(log_time)

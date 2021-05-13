@@ -1,6 +1,7 @@
 import ccxt
 import time
-import multiprocessing
+#import multiprocessing
+import threading
 
 from config import Config
 import constants
@@ -96,26 +97,29 @@ class Coin:
 	def __new__(cls, *args, **kwargs):
 		if not hasattr(cls, "_instance"):
 			cls._instance = super().__new__(cls)
+
 		return cls._instance
 	
 	def __init__(self):
 		cls = type(self)
+		
 		if not hasattr(cls, "_init"):
 			self.doge_price_store = Futures().fetch_futures_coin_price_usdt(constants.DOGE_SYMBOL)
-			
 			cls._init = True
 	
 	def update_price(self):
 		self.doge_price_store = Futures().fetch_futures_coin_price_usdt(constants.DOGE_SYMBOL)
-		
-	def update_price_periodical(self, period):
-		update_price_process = multiprocessing.Process(target=self.update_price_periodical_process, args=(period,))
-		update_price_process.start()
+
+	def run_update_price_periodical(self, period):
+		t = threading.Thread(target=self.update_price_periodical, args=(period,))
+		t.start()
 	
-	def update_price_periodical_process(self, period):
+	def update_price_periodical(self, period):
 		while True:
 			try:
 				self.update_price()
+				logger.logger.info("[{}] stored coin price = {}".format(time.strftime('%c', time.localtime(time.time())), self.doge_price_store))
+				
 				time.sleep(period)
 				
 			except Exception as e:
@@ -137,21 +141,23 @@ class Coin:
 	
 	def run(self, symbol, balance, duration):
 		if symbol == constants.DOGE_SYMBOL:
-			coin_count = int(balance / self.doge_price_store)
-			
-			logger.logger.info('coin count = {}'.format(coin_count))
+			price = self.doge_price_store
+			coin_count = int(balance / price)
 			
 			try:
 				Futures().futures_market_long(symbol, coin_count, False)
 				
-				half_coin_count = int(coin_count * 0.5)
-				half_duration = duration * 0.5
+				logger.logger.info('betting balance = {}, stored price = {}, coin count = {}'.format(balance, price, coin_count))
 				
-				time.sleep(half_duration)
-				Futures().futures_market_short(symbol, half_coin_count, True)
+				#half_coin_count = int(coin_count * 0.5)
+				#half_duration = duration * 0.5
 				
-				time.sleep(half_duration)
-				Futures().futures_market_short(symbol, coin_count - half_coin_count, True)
+				#time.sleep(half_duration)
+				#Futures().futures_market_short(symbol, half_coin_count, True)
+				
+				time.sleep(duration)
+				#Futures().futures_market_short(symbol, coin_count - half_coin_count, True)
+				Futures().futures_market_short(symbol, coin_count, True)
 				
 				self.update_price()
 			

@@ -1,4 +1,6 @@
 import tweepy
+import time
+import threading
 
 from exchange import Coin
 from twitter import Twitter
@@ -12,8 +14,8 @@ class App:
 		config = Config.load_config()
 		price_update_period = config['binance']['period']
 		
-		Coin().update_price_periodical(price_update_period)
-		
+		Coin().run_update_price_periodical(price_update_period)
+
 		while True:
 			try:
 				logger.logger.info('connect to '+constants.ELON_MUSK_TWITTER_ID+'...')
@@ -30,3 +32,4 @@ class App:
 				logger.logger.error(e)
 				
 				continue
+
